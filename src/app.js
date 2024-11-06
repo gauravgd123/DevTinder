@@ -1,28 +1,27 @@
 const express = require("express");
-
+const connectDB = require("./config/database");
 const app = express();
+const User = require("./models/user");
 
-app.listen(3000);
+
+app.use(express.json());
+
+app.post("/signup",async(req,res)=>{
+    
+    const user = new User(req.body);
+    await user.save();
+    res.send("data sent succesfully");
+});
+
+connectDB()
+.then(()=>{
+    console.log("Connection Established"); 
+    app.listen(7777,()=>{
+        console.log("server running on port no 7777"); 
+    });
+})
+.catch((err)=>{
+    console.log("Connection failed");
+});
  
-console.log("server is ready to use"); 
 
-//Authentication for Sending Data
-
-app.use("/admin",(req,res,next)=>{
-    const token = "xyz";
-    const isAdminAuthorized = token === "xyz" ;
-    if(!isAdminAuthorized){
-        res.status(402).send("Unathorized User");
-    }
-        console.log("Authorization is done");  
-        next();
-});
-
-app.get("/admin/sent",(req,res,next)=>{
-    res.send("Data Sent Successfully");
-    next();
-});
-
-app.get("/admin/delete",(req,res,next)=>{
-    res.send("Data deleted succesfully");
-});
